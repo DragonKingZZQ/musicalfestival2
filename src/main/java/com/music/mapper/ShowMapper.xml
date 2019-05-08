@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.music.mybatis.ShowMapper">
+	<resultMap type="com.music.entity.Show" id="ResultMap">
+		<id column = "id" property="id" jdbcType="INTEGER"/>
+		<result column="show_time" property="show_time" />				
+		<result column="actor_id" property="actor_id" />
+		<result column="count_num" property="count_num"/>
+		<result column="stage_name" property="stage_name"/>
+		<result column="order" property="order"/>
+		<result column="stage_time" property="stage_time"/>
+	</resultMap>
+	<!-- 用于pc端统计 -->
+	<resultMap type="com.music.entity.Show" id="ResultMapCount">
+		<id column = "id" property="id" jdbcType="INTEGER"/>
+		<result column="show_time" property="show_time" />				
+		<result column="actor_id" property="actor_id" />
+		<result column="count_num" property="count_num"/>
+		<result column="stage_name" property="stage_name"/>
+		<result column="order" property="order"/>
+		<result column="stage_time" property="stage_time"/>
+		<association property="actor" javaType="com.music.entity.Actor">
+			<id column = "id" property="id" jdbcType="INTEGER"/>
+			<result column="actor_name" property="actor_name" jdbcType="VARCHAR"/>				
+			<result column="actor_photo" property="actor_photo" jdbcType="VARCHAR"/>
+			<result column="introduce" property="introduce" jdbcType="VARCHAR"/>
+		</association>
+	</resultMap>
+	
+	<!-- 批量插入舞台数据 -->
+	<insert id="insertStage">
+		insert into performance (stage_name,stage_time,stage_order)
+		values
+		<foreach collection="stages" separator="," item="item" index="index">
+			(#{item.stage_name},#{item.stage_time},#{item.stage_order})
+		</foreach>
+	</insert>
+	<!-- 根据演出id删除演出 -->
+	<delete id="deleteByid">
+		delete from performance where id=#{id}
+	</delete>
+	<!-- 根据艺人id删除演出 -->
+	<delete id="deleteByactorid">
+		delete from performance where actor_id=#{id}
+	</delete>
+	
+	
+	<!-- 删除按钮删除舞台内所有信息 -->
+	<delete id="deleteStage" >  
+		delete from performance where stage_name=#{stage_name} and stage_time=#{stage_time}
+	</delete>
+	<!-- 按照日期进行删除 -->
+	<delete id="deleteByDate" >   
+		delete from performance where stage_time=#{stage_time} 
+	</delete>
+	<!-- 查询所有不同日期 -->
+	<select id="selectDateList" resultMap="ResultMap">
+		select distinct stage_time from performance
+	</select>
+	<!-- 根据日期查询所有舞台 pc端-->
+	<select id="selectStageList" resultMap="ResultMap">
+		select * from performance where stage_time = #{stage_time} and actor_id is  null
+	</select>
+	<!-- 更改中 如果无id插入一条舞台信息 -->
+	<insert id="insertStageOne">
+		insert into  performance (stage_name,stage_time,stage_order) 
+		values(#{Stage.stage_name},#{Stage.stage_time},#{Stage.stage_order})
+	</insert>
+	<!-- 更改中 如果有id修改一条舞台信息 -->
+	<update id="updateStageById">
+		update performance set stage_name=#{Stage.stage_name},stage_time=#{Stage.stage_time},
+		stage_order=#{Stage.stage_order} where id=#{Stage.id}	
+	</update>
+	<!-- 插入一条演出信息 -->
+	<insert id="insertShow">
+		insert into  performance (show_time,actor_id,stage_name,stage_time) 
+		values(#{Show.show_time},#{Show.actor_id},#{Show.stage_name},#{Show.stage_time})
+	</insert>
+	<!-- 更改演出信息 -->
+	<update id="updatePerformanById">
+		update performance set show_time=#{Show.show_time},stage_name=#{Show.stage_name},stage_time=#{Show.stage_time} where id=#{Show.id}	
+	</update>
+	<!-- 查询所有的演出信息按照点击量降序排序 pc端统计 -->
+	<select id="selectShowssList" resultMap="ResultMapCount">
+		select * from performance join actor on performance.actor_id=actor.id  order by count_num desc
+	</select>
+	
+	
+	
+	
+	
+	<!-- 请求所有舞台 小程序端 -->
+	<select id="selectStagesXiao" resultType="java.lang.String">
+		select distinct stage_name from performance where  actor_id is null 
+	</select>
+	<!-- 请求所有不同日期 -->
+	<select id="selectTimesXiao" resultType="java.lang.String">
+		select distinct stage_time from performance
+	</select>
+	 <!--按照日期和舞台名称进行查找演出信息,按照演出时间升序 小程序端
+	<select id="selectShowByDateAndTime" resultMap="WXResultMap">
+		select * from performance join where stage_time = #{stage_time} and stage_name=#{stage_name} and actor_id is not null order by show_time
+	</select> -->
+	<!--  按照日期和舞台名称进行查找演出信息,按照舞台升序 小程序端 -->
+	<select id="selectStagesByStageOrder" resultMap="ResultMap">
+		select * from performance where stage_time = #{stage_time} order by stage_order
+	</select>
+	<!-- 点赞数据+1-1 小程序端-->
+	<update id="updatePerformanCount">
+		<if test="means =='add'.toString()">
+			update performance set count_num=count_num+1 where id=#{id}	
+		 </if>
+		 <if test="means =='subtract'.toString()">
+			update performance set count_num=count_num-1 where id=#{id}	
+		 </if>
+	</update>
+	<!-- 小程序端 根据演出id拿到所有的艺人和演出信息 -->
+	<select id="selectOnePerformance" resultMap="ResultMapCount">
+		select * from performance join actor on performance.actor_id=actor.id  where performance.id = #{id}
+	</select>
+	<!-- 做定时任务 -->
+	<select id="selectTimeById" resultMap="ResultMap">
+		select show_time,stage_time from performance where id=#{id}
+	</select>
+	<!-- 根据演出时间，舞台时间，舞台名称来查询演出信息，得到演出id -->
+	<select id="selectIdByShow" >
+		select id from performance where show_time=#{show.show_time} and stage_name = #{stage_name} and stage_time = #{stage_time}
+	</select>
+	
+</mapper>

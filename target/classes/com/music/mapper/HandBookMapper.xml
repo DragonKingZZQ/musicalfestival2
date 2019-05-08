@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.music.mybatis.HandBookMapper">
+	<resultMap type="com.music.entity.HandBook" id="ResultMap">
+		<id column = "id" property="id" jdbcType="INTEGER"/>
+		<result column="handbook_url" property="handbook_url" jdbcType="VARCHAR"/>
+	
+	</resultMap>
+	<delete id="deleteById" > 
+		delete from handbook where id=#{id} 
+	</delete>
+	<select id="selectAll" resultMap="ResultMap">
+		select * from handbook
+	</select>
+	<insert id="insertHandBook">
+		insert into handbook(handbook_url) values(#{handbook_url})
+	</insert>
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.music.mybatis.ActorMapper">
+	<resultMap type="com.music.entity.Actor" id="ResultMap">
+		<id column = "id" property="id" jdbcType="INTEGER"/>
+		<result column="actor_name" property="actor_name" jdbcType="VARCHAR"/>				
+		<result column="actor_photo" property="actor_photo" jdbcType="VARCHAR"/>
+		<result column="actor_photo_min" property="actor_photo_min" jdbcType="VARCHAR"/>
+		<result column="introduce" property="introduce" jdbcType="VARCHAR"/>
+		
+	</resultMap>
+	<insert id="insertActor"  > 
+		insert into actor(actor_name,actor_photo,introduce,actor_photo_min) values(#{Actor.actor_name},#{Actor.actor_photo},#{Actor.introduce},#{Actor.actor_photo_min})
+	</insert>
+	<update id="modifiedActor" parameterType="com.music.entity.Actor">
+		update actor set actor_name=#{Actor.actor_name},actor_photo=#{Actor.actor_photo},introduce=#{Actor.introduce},actor_photo_min=#{Actor.actor_photo_min} where id=#{Actor.id}
+	</update>
+	<select id="selectActorList" resultMap="ResultMap">
+		select * from actor 
+	</select>
+	<select id="selectActorById" resultMap="ResultMap">
+		select * from actor where id=#{id}
+	</select>
+	<delete id="deleteActor" parameterType="int">
+		delete from actor where id=#{id}
+	</delete>
+</mapper>

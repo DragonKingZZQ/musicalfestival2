@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.music.mybatis.PlayMapper">
+	<resultMap type="com.music.entity.Play" id="ResultMap">
+		<id column = "id" property="id" jdbcType="INTEGER"/>
+		<result column="photo_url" property="photo_url" jdbcType="VARCHAR"/>
+		<result column="photo_point_url" property="photo_point_url" jdbcType="VARCHAR"/>		
+		
+	</resultMap>
+	<insert id="insertPhoto"  parameterType="String"> 
+		insert into playlist(photo_url) values(#{photo_url})
+	</insert>
+	<update id="updatePhoto_point_url" >
+		update playlist set photo_point_url = #{photo_point_url} where id = #{id}
+	</update>
+	<update id="updatePhoto_url" >
+		update playlist set photo_url = #{photo_url} where id = #{id}
+	</update>
+	<select id="selectList" resultMap="ResultMap">
+		select * from playlist
+	</select>
+	<select id="selectOne" parameterType="int" resultMap="ResultMap">
+		select * from playlist where id = #{id}
+	</select>
+	<delete id="deleteOne" parameterType="int">
+		delete from playlist where id= #{id}
+	</delete>
+</mapper>

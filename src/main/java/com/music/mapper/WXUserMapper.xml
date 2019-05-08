@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.music.mybatis.WXUserMapper">
+	<resultMap type="com.music.entity.WXUser" id="ResultMap">
+		<id column = "id" property="id" />
+		<result column="openid" property="openid" />
+		<result column="unionid" property="unionid" />		
+	</resultMap>
+	<insert id="insertWXUser" > 
+		insert into wx_user(openid) values(#{openid})
+	</insert>	
+	<select id="selectOpenid" resultMap="ResultMap">
+		select * from wx_user where openid = #{openid} 
+	</select>
+	<insert id="insertWXUserTwoValue" > 
+		insert into wx_user(openid,unionid) values(#{wx_user.openid},#{wx_user.unionid})
+	</insert>	
+	<update id="updateByOpenid">
+		update wx_user set unionid=#{wx_user.unionid} where openid=#{wx_user.openid}
+	</update>
+</mapper>

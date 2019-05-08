@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.music.mybatis.LinkMapper">
+	<resultMap type="com.music.entity.Link" id="ResultMap">
+		<id column = "id" property="id" />
+		<result column="link_type" property="link_type" />
+		<result column="link_url" property="link_url" />
+	</resultMap>
+	<update id="updateByLinkType" > 
+		update link set link_url=#{link_url} where link_type = #{link_type} 
+	</update>
+	<!-- 查链接 -->
+	<select id="selectByLinktype" resultMap="ResultMap">
+		select * from link where link_type = #{link_type}
+	</select>
+	<!-- 查询pdf或者html ?????没有用到-->
+	<select id="selectByPDFOrHTML" resultType="java.lang.String">
+		select link_url from link where link_type = #{link_type}
+	</select>
+	<insert id="insertByLinktype" >
+		insert into link(link_type,link_url) values(#{link_type},#{link_url}) 
+	</insert>
+	<select id="selectLinkList" resultMap="ResultMap">
+		select * from link 
+	</select> 
+</mapper>

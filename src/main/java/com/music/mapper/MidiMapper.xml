@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.music.mybatis.MidiMapper">
+	<resultMap type="com.music.entity.Midi" id="ResultMap">
+		<id column = "id" property="id" />
+		<result column="openid" property="openid" />
+		<result column="unionid" property="unionid" />		
+	</resultMap>
+	<insert id="insertMIDI" > 
+		insert into midi(openid) values(#{openid})
+	</insert>	
+	<select id="selectMidiByopenid" resultMap="ResultMap">
+		select * from midi where openid = #{openid} 
+	</select>
+	<insert id="insertMIDITwoValue" > 
+		insert into midi(openid,unionid) values(#{midi.openid},#{midi.unionid})
+	</insert>
+	<update id="updateMIDITwoValue" > 
+		update midi set unionid = #{midi.unionid} where openid=#{midi.openid}
+	</update>
+	<select id="selectMidiByunionid" resultMap="ResultMap">
+		select * from midi where unionid=#{unionid}
+	</select>	
+	<select id="findAllMidis" resultMap="ResultMap">
+		select * from midi
+	</select>
+	<select id="findAllNothaveUnionid" resultMap="ResultMap">
+		select * from midi where unionid is null
+	</select>
+</mapper>

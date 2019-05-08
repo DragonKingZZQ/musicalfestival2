@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.music.mybatis.NextopenidMapper">
+	<resultMap type="com.music.entity.Nextopenid" id="ResultMap">
+		<id column = "id" property="id" jdbcType="VARCHAR"/>
+		<result column="next_openid" property="next_openid" jdbcType="VARCHAR"/>
+	</resultMap>
+	<select id="findAllnextopenid" resultMap="ResultMap">
+		select * from nextopenid where id="1" 
+	</select>
+	<update id="updateNextopenidById" >
+		update nextopenid set next_openid=#{id} where id="1"
+	</update>
+	<insert id="insertNextopenid" >
+		insert into nextopenid (id,next_openid)values(#{Nextopenid.id},#{Nextopenid.next_openid}) 
+	</insert>
+	
+</mapper>

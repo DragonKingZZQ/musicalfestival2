@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.music.mybatis.WXVoMapper">
+	<resultMap type="com.music.entity.WXVo" id="ResultMap">
+		<id column = "id" property="id" jdbcType="INTEGER"/>
+		<result column="show_time" property="show_time" />				
+		<result column="perid" property="perid" />
+		<result column="actor_id" property="actor_id" />
+		<result column="stage_name" property="stage_name"/>		
+		<result column="stage_time" property="stage_time"/>
+		<result column="stage_order" property="stage_order"/>
+		<result column="actor_photo" property="actor_photo"/>
+		<result column="actor_photo_min" property="actor_photo_min"/>
+		<result column="actor_name" property="actor_name"/>
+		<result column="introduce" property="introduce"/>
+	</resultMap>
+	
+	<!-- 根据用户id和演出日期 查询演出详细信息、用户是否关注、舞台顺序升序 -->
+	<select id="wxselectBystage" resultMap="ResultMap">
+	SELECT DISTINCT * from 
+(SELECT ea.*,eb.actor_name,eb.actor_photo,eb.actor_photo_min,eb.introduce FROM
+(SELECT * from
+(SELECT perid from collect where openid=#{openid}) ca
+RIGHT  JOIN 
+(SELECT db.id,db.show_time,db.actor_id,db.stage_time,db.stage_name,da.stage_order from
+(select stage_name,stage_time,stage_order from performance
+ where stage_time=#{stage_time} and actor_id is null ) da 
+LEFT JOIN performance db 
+on da.stage_name=db.stage_name and da.stage_time=db.stage_time and db.actor_id is not null ) cb
+ON cb.id=ca.perid
+) ea
+LEFT JOIN
+actor eb
+on
+eb.id=ea.actor_id) fa
+where fa.actor_id is not null
+ORDER BY fa.show_time ASC
+
+	</select>
+	
+	<!-- 根据用户id、演出日期、演出舞台  查询演出详细信息以及用户是否关注  演出时间升序排序-->
+	<select id="wxselectBytime" resultMap="ResultMap">
+	SELECT * from 
+(SELECT ea.*,eb.actor_name,eb.actor_photo,eb.actor_photo_min,eb.introduce FROM
+(SELECT * from
+(SELECT perid from collect where openid=#{openid}) ca
+RIGHT  JOIN 
+(SELECT db.id,db.show_time,db.actor_id,db.stage_time,db.stage_name,da.stage_order from
+(select stage_name,stage_time,stage_order from performance
+ where stage_time=#{stage_time} and actor_id is null ) da 
+LEFT JOIN performance db 
+on da.stage_name=db.stage_name and da.stage_time=db.stage_time and db.actor_id is not null ) cb
+ON cb.id=ca.perid
+) ea
+LEFT JOIN
+actor eb
+on
+eb.id=ea.actor_id) fa
+where fa.actor_id is not null
+ORDER BY fa.show_time ASC
+	</select>
+	
+	<!--查询 大于等于今天 最近日期-->
+	<select id="wxselectMinTime" resultType="java.lang.String">
+		select distinct Min(stage_time)stage_time from performance where actor_id is not null and stage_time >= #{now_time}
+	</select>
+	<!-- 根据用户id、最近演出日期、 查询演出详细信息以及用户是否关注  演出时间升序排序-->
+	<select id="wxselectNextShow" resultMap="ResultMap">
+		SELECT ea.*,eb.actor_name,eb.actor_photo,eb.actor_photo_min,eb.introduce FROM
+(SELECT * from
+(SELECT perid from collect where openid=#{openid}) ca
+RIGHT  JOIN 
+(SELECT db.id,db.show_time,db.actor_id,db.stage_time,db.stage_name,da.stage_order from
+(select stage_name,stage_time,stage_order from performance
+ where stage_time=#{stage_time} and actor_id is not null ) da 
+LEFT JOIN performance db 
+on da.stage_name=db.stage_name and da.stage_time=db.stage_time and db.actor_id is not null ) cb
+ON cb.id=ca.perid
+) ea
+LEFT JOIN
+actor eb
+on
+eb.id=ea.actor_id
+ORDER BY ea.show_time ASC
+		
+	</select>
+	
+	<select id="wxselectByActor" resultMap="ResultMap">
+	SELECT * from
+(SELECT perid from collect where openid=#{openid}) ba
+RIGHT JOIN
+(SELECT ab.*,aa.actor_name,aa.actor_photo,aa.actor_photo_min,aa.introduce from actor aa
+JOIN performance ab
+on aa.id=ab.actor_id
+where  aa.id=#{actor_id}) bb
+ON ba.perid=bb.id
+ORDER BY bb.show_time ASC
+	</select>
+	
+	<select id="wxselectByOpenIdAndDate" resultMap="ResultMap">
+	SELECT DISTINCT d1.*,d2.actor_name,d2.actor_photo,d2.actor_photo_min,d2.introduce from (SELECT * from
+(SELECT perid from collect where openid=#{openid}) ca
+RIGHT  JOIN 
+(SELECT db.id,db.show_time,db.actor_id,db.stage_time,db.stage_name,da.stage_order from
+(select stage_name,stage_time,stage_order from performance
+ where stage_time=#{stage_time} and actor_id is null ) da 
+LEFT JOIN performance db 
+on da.stage_name=db.stage_name and da.stage_time=db.stage_time and db.actor_id is not null ) cb
+ON cb.id=ca.perid
+) d1
+LEFT JOIN
+actor d2
+ON d2.id=d1.actor_id
+ORDER BY d1.stage_order ASC
+
+</select>
+</mapper>
